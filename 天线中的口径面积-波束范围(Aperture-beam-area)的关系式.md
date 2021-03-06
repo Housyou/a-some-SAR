@@ -50,7 +50,7 @@
 
 根据示意图，或者说简化考虑，<img src="https://render.githubusercontent.com/render/math?math=\theta=\theta_0=0" />，此处仅考虑振幅不考虑相位，故
 
-<img src="https://render.githubusercontent.com/render/math?math=E_r=\frac{1}{\lambda}\frac{1+1}{2}E_a\frac{1}{r}A_e=\frac{E_aA_e}{r\lambda}" />
+<img src="https://render.githubusercontent.com/render/math?math=E_r=\frac{1}{\lambda}\frac{2}{2}E_a\frac{1}{r}A_e=\frac{E_aA_e}{r\lambda}" />
 
 
 <img src="https://render.githubusercontent.com/render/math?math=E_r^2=\frac{E_a^2A_e^2}{r^2\lambda^2}" />
