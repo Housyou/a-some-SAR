@@ -42,7 +42,7 @@ def img2base64():
 
 
 def img_url(name):
-    res = 'https://raw.githubusercontent.com/Housyou/SAR/master/origin%20ver/a0/imgs/' + '%s.png' % name
+    res = 'https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a0/imgs/' + '%s.png' % name
     print(res)
 
 

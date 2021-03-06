@@ -1,4 +1,4 @@
-![title](https://raw.githubusercontent.com/Housyou/SAR/master/origin%20ver/a0/imgs/1.png)
+![img1](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a0/imgs/1.png)
 # 天线中的口径面积-波束范围(Aperture-beam-area)的关系
 
 约翰·克劳斯(John D.Kraus)等编著的《天线》（第三版）第2章-天线基础 2.9节-天线口径 公式(5)-口径面积-波束范围(Aperture-beam-area)的关系式
@@ -16,7 +16,7 @@
 <img src="https://www.zhihu.com/equation?tex=P=\frac{E_a^2}{Z_0}A_e\quad(W)" alt="P=\frac{E_a^2}{Z_0}A_e\quad(W)" class="ee_img tr_noresize" eeimg="1">
 
 >式中<img src="https://www.zhihu.com/equation?tex=Z_0" alt="Z_0" class="ee_img tr_noresize" eeimg="1">为媒质的本征阻抗（在空气或真空中为377 <img src="https://www.zhihu.com/equation?tex=\Omega" alt="\Omega" class="ee_img tr_noresize" eeimg="1"> ）。
-![photo](https://raw.githubusercontent.com/Housyou/SAR/master/origin%20ver/a0/imgs/2.png)
+![img2](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a0/imgs/2.png)
 
 假定在距离为 <img src="https://www.zhihu.com/equation?tex=r" alt="r" class="ee_img tr_noresize" eeimg="1"> 处有均匀的远场 <img src="https://www.zhihu.com/equation?tex=E" alt="E" class="ee_img tr_noresize" eeimg="1">，则辐射功率还可写成
 
@@ -38,7 +38,7 @@
 >3. <img src="https://www.zhihu.com/equation?tex=\tilde E_r\propto \frac{e^{ikr}}{r}" alt="\tilde E_r\propto \frac{e^{ikr}}{r}" class="ee_img tr_noresize" eeimg="1"> 次波源发出的球面波到达场点
 >4. <img src="https://www.zhihu.com/equation?tex=\tilde E_r\propto dS" alt="\tilde E_r\propto dS" class="ee_img tr_noresize" eeimg="1"> 波前上作为次波源的微分面源
 
-![photo](https://raw.githubusercontent.com/Housyou/SAR/master/origin%20ver/a0/imgs/3.png)
+![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a0/imgs/3.png)
 
 >**基尔霍夫衍射积分公式**
 >
