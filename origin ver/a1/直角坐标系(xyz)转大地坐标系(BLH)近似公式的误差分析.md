@@ -1,3 +1,4 @@
+注意上式中经度$L$使用的是$arctan2$函数而非$arctan$函数。
 > $arctan$函数与$arctan2$函数的转换关系
 > $$arctan2(y,x) = \begin{cases}  
 arctan(\frac{y}{x}) & x\gt0\\
@@ -7,30 +8,46 @@ arctan(\frac{y}{x})-\pi & y\lt0,x\lt0\\
 -\frac{\pi}{2} & y\lt0,x=0\\
 undefined & y=0,x=0
 \end{cases}$$
+![img1](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/1.png)
+> $arctan$图像显然是中心对称的，但这不符合经度的变化规律；如果将$-\pi$和$\pi$相连，就像东西经$180\degree$那样，$arctan2$函数就是连续的。
+>> $arctan$函数值域是$(-\frac{\pi}{2},\frac{\pi}{2})$，因为不存在无穷大的角；但
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
 
-start, end, num = -1, 1, 100
-var = np.linspace(start, end, num + 1)  # 变量区间[-1,1]，在这之中取101个数
+start, end, num = -1, 1, 1000
+var = np.linspace(start, end, num + 1)  # 变量区间[-1,1]，在这之中取1001个数
 x, y = np.meshgrid(var, var)
-# x, y的shape都是(101,101)，表示这101x101个点的二维坐标
-axes = (plt.subplot(1, 2, 1), plt.subplot(1, 2, 2))
-z = (np.arctan(y / x) / np.pi, np.arctan2(y, x) / np.pi)
-titles = ('arctan(y/x)', 'arctan2(y,x)')
-for i, j, k in zip(axes, z, titles):
-    ai = i.imshow(j, cmap='gray')
-    i.set_ylim(0, num)  # y轴方向调整为朝上
-    i.set_xticks([0, num])  # 因为有101个点，所以取值范围是[0,100]
-    i.set_xticklabels([start, end])  # 把取值还原回[-1,1]
-    i.set_xlabel('x')
-    i.set_yticks([0, num])
-    i.set_yticklabels([start, end])
-    i.set_ylabel('y')
-    i.set_title(k)
-colorbar = plt.colorbar(ai, ax=axes)  # 共用一个colorbar
-colorbar.set_ticks([-0.99, -0.5, 0, 0.5, 1])
-colorbar.set_ticklabels(
-    [r'$-0.99\pi$', r'$-\pi/2$', '0', r'$\pi/2$', r'$\pi$'])
+# x, y的shape都是(1001,1001)，表示这1001x1001个点的二维坐标
+
+
+def plot(index, img, title, color_ticks, color_ticklabels):
+    ax = plt.subplot(1, 2, index)
+    ax.spines['right'].set_color('none')  # 调整坐标轴的位置
+    ax.spines['top'].set_color('none')
+    ax.spines['bottom'].set_position(('data', num / 2))
+    ax.spines['left'].set_position(('data', num / 2))
+    blank = num * 0.1
+    ax.set_xlim(-blank, num + blank)
+    ax.set_ylim(-blank, num + blank)  # 若不调整，y轴方向朝下
+    ax.set_xticks([0, num])  # 因为有1001个点，所以取值范围是[0,1000]
+    ax.set_xticklabels([start, end])  # 把取值还原回[-1,1]
+    ax.set_yticks([0, num])
+    ax.set_yticklabels([start, end])
+    ax.set_title(title)
+    ai = ax.imshow(img, cmap='rainbow')
+    colorbar = plt.colorbar(ai, ax=ax)
+    colorbar.set_ticks(color_ticks)
+    colorbar.set_ticklabels(color_ticklabels)
+
+
+z = np.arctan(y / x) / np.pi
+plot(1, z, 'arctan(y/x)', [-0.49, -0.25, 0, 0.25, 0.49],
+     [r'$-0.49\pi$', r'$-\pi/4$', '0', r'$\pi/4$', r'0.49$\pi$'])
+
+z = np.arctan2(y, x) / np.pi
+plot(2, z, 'arctan2(y,x)', [-0.99, -0.5, 0, 0.5, 1],
+     [r'$-0.99\pi$', r'$-\pi/2$', '0', r'$\pi/2$', r'$\pi$'])
+
 plt.show()
 ```
