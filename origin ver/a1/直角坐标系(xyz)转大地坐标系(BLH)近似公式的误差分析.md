@@ -1,5 +1,8 @@
-![img1](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/1.png)
+![title](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/2.png)
 # 直角坐标系(xyz)转大地坐标系(BLH)近似公式的误差分析
+虽然这并不是一个很有深度的问题，但我觉得可以说说。  
+![img1](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/1.png)
+BLH坐标系转换为xyz坐标系很简单
 
 注意上式中经度$L$使用的是$arctan2$函数而非$arctan$函数。
 > $arctan$函数与$arctan2$函数的转换关系
@@ -11,9 +14,9 @@ arctan(\frac{y}{x})-\pi & y\lt0,x\lt0\\
 -\frac{\pi}{2} & y\lt0,x=0\\
 undefined & y=0,x=0
 \end{cases}$$
-![img1](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/1.png)
-> $arctan$图像显然是中心对称的，但这不符合经度的变化规律；如果将$-\pi$和$\pi$相连，就像东西经$180\degree$那样，$arctan2$函数就是连续的。
->> $arctan$函数值域是$(-\frac{\pi}{2},\frac{\pi}{2})$，因为不存在无穷大的角；但
+![img2](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/2.png)
+> $arctan$的值域是$(-\frac{\pi}{2},\frac{\pi}{2})$，图像是中心对称的，这不符合经度的变化规律；  
+> $arctan2$的值域是$(-\pi,\pi]，$如果将$-\pi$和$\pi$相连，就像东西经$180\degree$那样，$arctan2$函数就是连续的。
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
