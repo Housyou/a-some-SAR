@@ -193,7 +193,8 @@ print(xyz2BLH(x, y, z, rad=False))
 ```
 在对电离层网格进行插值之类的场景下，这个误差应该算接受，但我做的实验精度要求亚米级，所以只能采用迭代公式。最后探究一下这个误差变化的规律：
 ![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/3.png)
-![img4](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/4.png)
+
+可见误差几乎仅与纬度有关，垂直误差$(\Delta H)$随着纬度的升高而增大，南北误差$(\Delta B)$在$60\degree$左右时最大。或许制作一个查找表，或者给$B$的近似表达式增加一个修正项，
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
