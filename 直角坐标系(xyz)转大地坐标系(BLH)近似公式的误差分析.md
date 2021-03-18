@@ -1,23 +1,33 @@
 ![title](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/2.png)
 # 地固坐标系(xyz)转大地坐标系(BLH)近似公式的误差分析
 虽然这并不是一个有深度的问题，但我觉得可以说说。  
-> $BLH$坐标系中，$L$为经度，$B$为纬度，$H$为点到地球椭球面高程。 
+> <img src="https://render.githubusercontent.com/render/math?math=BLH" />坐标系中，<img src="https://render.githubusercontent.com/render/math?math=L" />为经度，<img src="https://render.githubusercontent.com/render/math?math=B" />为纬度，<img src="https://render.githubusercontent.com/render/math?math=H" />为点到地球椭球面高程。 
  
-> $xyz$坐标系原点$O$为地球质心，$z$轴与地轴平行指向北极点，$x$轴指向本初子午线与赤道的交点，$y$轴垂直于$xOz$平面构成右手坐标系(即指向东经$90°$与赤道的交点)。
+> <img src="https://render.githubusercontent.com/render/math?math=xyz" />坐标系原点<img src="https://render.githubusercontent.com/render/math?math=O" />为地球质心，<img src="https://render.githubusercontent.com/render/math?math=z" />轴与地轴平行指向北极点，<img src="https://render.githubusercontent.com/render/math?math=x" />轴指向本初子午线与赤道的交点，<img src="https://render.githubusercontent.com/render/math?math=y" />轴垂直于<img src="https://render.githubusercontent.com/render/math?math=xOz" />平面构成右手坐标系(即指向东经<img src="https://render.githubusercontent.com/render/math?math=90°" />与赤道的交点)。
 
 ![img1](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/1.png)
 
-类似于通过三角函数求值，$BLH$坐标系转换为$xyz$坐标系很简单:
+类似于通过三角函数求值，<img src="https://render.githubusercontent.com/render/math?math=BLH" />坐标系转换为<img src="https://render.githubusercontent.com/render/math?math=xyz" />坐标系很简单:
 > # BLH2xyz
-> $a = 6378137.0000 m$，为地球椭球的长半轴  
-> $b = 6356752.3141 m$，为地球椭球的短半轴  
-> $$e^2 = 1 - (\frac{b}{a})^2$$
-> $$N=\frac{a}{\sqrt{1-e^2sin^2B}}$$ 
-> $N$为卯酉圈半径  
+> <img src="https://render.githubusercontent.com/render/math?math=a = 6378137.0000 m" />，为地球椭球的长半轴  
+> <img src="https://render.githubusercontent.com/render/math?math=b = 6356752.3141 m" />，为地球椭球的短半轴  
+> 
+<img src="https://render.githubusercontent.com/render/math?math=e^2 = 1 - (\frac{b}{a})^2" />
+
+> 
+<img src="https://render.githubusercontent.com/render/math?math=N=\frac{a}{\sqrt{1-e^2sin^2B}}" />
+ 
+> <img src="https://render.githubusercontent.com/render/math?math=N" />为卯酉圈半径  
 > ~~没有找到合适的图而且我也不知道卯酉圈是哪个圈反正当作辅助量就好了~~
-> $$x=(N+H)cosBcosL$$
-> $$y=(N+H)cosBsinL$$
-> $$z=[N(1-e^2)+H]sinB$$
+> 
+<img src="https://render.githubusercontent.com/render/math?math=x=(N+H)cosBcosL" />
+
+> 
+<img src="https://render.githubusercontent.com/render/math?math=y=(N+H)cosBsinL" />
+
+> 
+<img src="https://render.githubusercontent.com/render/math?math=z=[N(1-e^2)+H]sinB" />
+
 ```python
 import numpy as np
 
@@ -47,29 +57,39 @@ print(BLH2xyz(L, B, H, rad=False))
 ```
 xyz坐标系转换为BLH坐标系的公式，需要从上式中反解出来：
 > # xyz2BLH 迭代公式
-> 已知$x=(N+H)cosBcosL$，$y=(N+H)cosBsinL$，故
-> $$L=arctan2(y,x)$$
-> 设$p=\sqrt{x^2+y^2}$，$cosB\ge0$恒成立($-90\degree\le B\le90\degree$)，则
-> $$p=(N+H)cosB$$
-> 因为$z=[N(1-e^2)+H]sinB$，故
-> $$B=arctan(\frac{z(N+H)}{[N(1-e^2)+H]p})=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})$$
-> $$H=\frac{z}{sinB}-N(1-e^2)=\frac{p}{cosB}-N$$
-> 其中
-> $$N=\frac{a}{\sqrt{1-e^2sin^2B}}$$
+> 已知<img src="https://render.githubusercontent.com/render/math?math=x=(N+H)cosBcosL" />，<img src="https://render.githubusercontent.com/render/math?math=y=(N+H)cosBsinL" />，故
+> 
+<img src="https://render.githubusercontent.com/render/math?math=L=arctan2(y,x)" />
 
-注意上式中经度$L$使用的是$arctan2$函数而非$arctan$函数。
-> $arctan$函数与$arctan2$函数的转换关系
-> $$arctan2(y,x) = \begin{cases}  
+> 设<img src="https://render.githubusercontent.com/render/math?math=p=\sqrt{x^2+y^2}" />，<img src="https://render.githubusercontent.com/render/math?math=cosB\ge0" />恒成立(<img src="https://render.githubusercontent.com/render/math?math=-90\degree\le B\le90\degree" />)，则
+> 
+<img src="https://render.githubusercontent.com/render/math?math=p=(N+H)cosB" />
+
+> 因为<img src="https://render.githubusercontent.com/render/math?math=z=[N(1-e^2)+H]sinB" />，故
+> 
+<img src="https://render.githubusercontent.com/render/math?math=B=arctan(\frac{z(N+H)}{[N(1-e^2)+H]p})=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})" />
+
+> 
+<img src="https://render.githubusercontent.com/render/math?math=H=\frac{z}{sinB}-N(1-e^2)=\frac{p}{cosB}-N" />
+
+> 其中
+> 
+<img src="https://render.githubusercontent.com/render/math?math=N=\frac{a}{\sqrt{1-e^2sin^2B}}" />
+
+
+注意上式中经度<img src="https://render.githubusercontent.com/render/math?math=L" />使用的是<img src="https://render.githubusercontent.com/render/math?math=arctan2" />函数而非<img src="https://render.githubusercontent.com/render/math?math=arctan" />函数。
+> <img src="https://render.githubusercontent.com/render/math?math=arctan" />函数与<img src="https://render.githubusercontent.com/render/math?math=arctan2" />函数的转换关系
+> <img src="https://render.githubusercontent.com/render/math?math=" />arctan2(y,x) = \begin{cases}  
 arctan(\frac{y}{x}) & x\gt0\\
 arctan(\frac{y}{x})+\pi & y\ge0,x\lt0\\
 arctan(\frac{y}{x})-\pi & y\lt0,x\lt0\\
 \frac{\pi}{2} & y\gt0,x=0\\
 -\frac{\pi}{2} & y\lt0,x=0\\
 undefined & y=0,x=0
-\end{cases}$$
+\end{cases}<img src="https://render.githubusercontent.com/render/math?math=" />
 ![img2](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/2.png)
-> $arctan$的值域是$(-\frac{\pi}{2},\frac{\pi}{2})$，图像是中心对称的，这不符合经度的变化规律；  
-> $arctan2$的值域是$(-\pi,\pi]，$如果将$-\pi$和$\pi$相连，就像东西经$180\degree$那样，$arctan2$函数就是连续的。
+> <img src="https://render.githubusercontent.com/render/math?math=arctan" />的值域是<img src="https://render.githubusercontent.com/render/math?math=(-\frac{\pi}{2},\frac{\pi}{2})" />，图像是中心对称的，这不符合经度的变化规律；  
+> <img src="https://render.githubusercontent.com/render/math?math=arctan2" />的值域是<img src="https://render.githubusercontent.com/render/math?math=(-\pi,\pi]，" />如果将<img src="https://render.githubusercontent.com/render/math?math=-\pi" />和<img src="https://render.githubusercontent.com/render/math?math=\pi" />相连，就像东西经<img src="https://render.githubusercontent.com/render/math?math=180\degree" />那样，<img src="https://render.githubusercontent.com/render/math?math=arctan2" />函数就是连续的。
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
@@ -102,20 +122,28 @@ def plot(index, img, title, color_ticks, color_ticklabels):
 
 z = np.arctan(y / x) / np.pi
 plot(1, z, 'arctan(y/x)', [-0.49, -0.25, 0, 0.25, 0.49],
-     [r'$-0.49\pi$', r'$-\pi/4$', '0', r'$\pi/4$', r'0.49$\pi$'])
+     [r'<img src="https://render.githubusercontent.com/render/math?math=-0.49\pi" />', r'<img src="https://render.githubusercontent.com/render/math?math=-\pi/4" />', '0', r'<img src="https://render.githubusercontent.com/render/math?math=\pi/4" />', r'0.49<img src="https://render.githubusercontent.com/render/math?math=\pi" />'])
 
 z = np.arctan2(y, x) / np.pi
 plot(2, z, 'arctan2(y,x)', [-0.99, -0.5, 0, 0.5, 1],
-     [r'$-0.99\pi$', r'$-\pi/2$', '0', r'$\pi/2$', r'$\pi$'])
+     [r'<img src="https://render.githubusercontent.com/render/math?math=-0.99\pi" />', r'<img src="https://render.githubusercontent.com/render/math?math=-\pi/2" />', '0', r'<img src="https://render.githubusercontent.com/render/math?math=\pi/2" />', r'<img src="https://render.githubusercontent.com/render/math?math=\pi" />'])
 
 plt.show()
 ```
-回到xyz2BLH 迭代公式。$B、N、H$的三个量互相纠缠，需要通过迭代法来求值。假设$H=0$
-$$B_0 =arctan(\frac{z}{(1-e^2)p})$$ 
+回到xyz2BLH 迭代公式。<img src="https://render.githubusercontent.com/render/math?math=B、N、H" />的三个量互相纠缠，需要通过迭代法来求值。假设<img src="https://render.githubusercontent.com/render/math?math=H=0" />
+
+<img src="https://render.githubusercontent.com/render/math?math=B_0 =arctan(\frac{z}{(1-e^2)p})" />
+ 
 那么
-$$N_k=\frac{a}{\sqrt{1-e^2sin^2B_{k-1}}}$$
-$$H_k=\frac{p}{cosB_{k-1}}-N_k$$
-$$B_k=arctan(\frac{z}{(1-\frac{e^2N_k}{N_k+H_k})p})$$
+
+<img src="https://render.githubusercontent.com/render/math?math=N_k=\frac{a}{\sqrt{1-e^2sin^2B_{k-1}}}" />
+
+
+<img src="https://render.githubusercontent.com/render/math?math=H_k=\frac{p}{cosB_{k-1}}-N_k" />
+
+
+<img src="https://render.githubusercontent.com/render/math?math=B_k=arctan(\frac{z}{(1-\frac{e^2N_k}{N_k+H_k})p})" />
+
 ```python
 import numpy as np
 
@@ -156,13 +184,21 @@ print(xyz2BLH(x, y, z, rad=False))
 # (116.0, 40.00000000005382, 235.00000501424074)
 ```
 > # xyz2BLH 近似公式
-> 已知$p=\sqrt{x^2+y^2}$，$L=arctan2(y,x)$，迭代公式中$B=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})$。放弃这个公式，设
-> $$\theta=arctan(\frac{z\cdot a}{p\cdot b})$$
+> 已知<img src="https://render.githubusercontent.com/render/math?math=p=\sqrt{x^2+y^2}" />，<img src="https://render.githubusercontent.com/render/math?math=L=arctan2(y,x)" />，迭代公式中<img src="https://render.githubusercontent.com/render/math?math=B=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})" />。放弃这个公式，设
+> 
+<img src="https://render.githubusercontent.com/render/math?math=\theta=arctan(\frac{z\cdot a}{p\cdot b})" />
+
 > 用
-> $$B=arctan(\frac{z+e^2bsin^3\theta}{p-e^2acos^3\theta})$$
-> 来替代迭代公式中的$B$表达式~~我也不知道原理是什么~~，$N$和$H$保持不变
-> $$N=\frac{a}{\sqrt{1-e^2sin^2B}}$$ 
-> $$H=\frac{p}{cosB}-N$$
+> 
+<img src="https://render.githubusercontent.com/render/math?math=B=arctan(\frac{z+e^2bsin^3\theta}{p-e^2acos^3\theta})" />
+
+> 来替代迭代公式中的<img src="https://render.githubusercontent.com/render/math?math=B" />表达式~~我也不知道原理是什么~~，<img src="https://render.githubusercontent.com/render/math?math=N" />和<img src="https://render.githubusercontent.com/render/math?math=H" />保持不变
+> 
+<img src="https://render.githubusercontent.com/render/math?math=N=\frac{a}{\sqrt{1-e^2sin^2B}}" />
+ 
+> 
+<img src="https://render.githubusercontent.com/render/math?math=H=\frac{p}{cosB}-N" />
+
 ```python
 import numpy as np
 
@@ -195,7 +231,7 @@ print(xyz2BLH(x, y, z, rad=False))
 在对电离层网格进行插值之类的场景下，这个误差应该算是可以接受，但我做的实验精度要求亚米级，所以只能采用迭代公式。最后探究一下这个误差变化的规律：
 ![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/3.png)
 
-可见误差几乎仅与纬度有关，垂直误差$(\Delta H)$随着纬度的升高而增大，南北误差$(\Delta B)$在$60\degree$左右时最大。或许制作一个查找表，或者给$B$的近似表达式增加一个修正项会更好。
+可见误差几乎仅与纬度有关，垂直误差<img src="https://render.githubusercontent.com/render/math?math=(\Delta H)" />随着纬度的升高而增大，南北误差<img src="https://render.githubusercontent.com/render/math?math=(\Delta B)" />在<img src="https://render.githubusercontent.com/render/math?math=60\degree" />左右时最大。或许制作一个查找表，或者给<img src="https://render.githubusercontent.com/render/math?math=B" />的近似表达式增加一个修正项会更好。
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -294,20 +330,20 @@ if __name__ == '__main__':
         ax.set_xlim(0, Bnum)
         ax.set_xticks([0, Bnum/2, Bnum])
         ax.set_xticklabels([Bmin, np.mean([Bmin, Bmax]), Bmax])
-        ax.set_xlabel(r'$B (\degree)$')
+        ax.set_xlabel(r'<img src="https://render.githubusercontent.com/render/math?math=B (\degree)" />')
         ax.set_ylim(0, Hnum)
         ax.set_yticks([0, Hnum/2, Hnum])
         ax.set_yticklabels([Hmin, (Hmin+Hmax)/2, Hmax])
-        ax.set_ylabel(r'$H (m)$')
+        ax.set_ylabel(r'<img src="https://render.githubusercontent.com/render/math?math=H (m)" />')
         plt.colorbar(ai, ax=ax).set_label(title)
         ax = plt.subplot(2, 2, 2 * index)
         ax.plot(B0, img[0, :], label='H = %dm' % Hmin)
-        ax.set_xlabel(r'$B (\degree)$')
+        ax.set_xlabel(r'<img src="https://render.githubusercontent.com/render/math?math=B (\degree)" />')
         ax.set_ylabel(title)
         plt.legend()
 
     dH = (ha - hr).reshape((Hnum + 1, -1))
-    plot(1, dH, r'$\Delta H (m)$高程误差')
+    plot(1, dH, r'<img src="https://render.githubusercontent.com/render/math?math=\Delta H (m)" />高程误差')
     dB = dB2distance(br-ba, rad=False).reshape((Hnum + 1, -1))
     plot(2, dB, r'南北距离误差 (m)')
     plt.show()

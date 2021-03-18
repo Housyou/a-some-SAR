@@ -4,7 +4,7 @@ import base64
 
 
 def replace_tex(inline_tag, directory):
-    filename = 'a0/天线中的口径面积-波束范围(Aperture-beam-area)的关系式.md'
+    filename = 'a1/直角坐标系(xyz)转大地坐标系(BLH)近似公式的误差分析.md'
 
     def dashrepl(matchobj, tag):
         formular = matchobj.group(1)
