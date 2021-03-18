@@ -158,7 +158,7 @@ print(xyz2BLH(x, y, z, rad=False))
 > 已知$p=\sqrt{x^2+y^2}$，$L=arctan2(y,x)$，$B=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})$，设
 > $$\theta=arctan(\frac{z\cdot a}{p\cdot b})$$
 > 用
-> $$B=arctan(\frac{Z+e^2bsin^3\theta}{p-e^2acos^3\theta})$$
+> $$B=arctan(\frac{z+e^2bsin^3\theta}{p-e^2acos^3\theta})$$
 > 来替代迭代公式中的B表达式~~我也不知道原理是什么~~，N和H保持不变
 > $$N=\frac{a}{\sqrt{1-e^2sin^2B}}$$ 
 > $$H=\frac{p}{cosB}-N$$
@@ -194,7 +194,7 @@ print(xyz2BLH(x, y, z, rad=False))
 在对电离层网格进行插值之类的场景下，这个误差应该算接受，但我做的实验精度要求亚米级，所以只能采用迭代公式。最后探究一下这个误差变化的规律：
 ![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/3.png)
 
-可见误差几乎仅与纬度有关，垂直误差$(\Delta H)$随着纬度的升高而增大，南北误差$(\Delta B)$在$60\degree$左右时最大。或许制作一个查找表，或者给$B$的近似表达式增加一个修正项，
+可见误差几乎仅与纬度有关，垂直误差$(\Delta H)$随着纬度的升高而增大，南北误差$(\Delta B)$在$60\degree$左右时最大。或许制作一个查找表，或者给$B$的近似表达式增加一个修正项会更好。
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -280,15 +280,15 @@ if __name__ == '__main__':
     L = 116
     Bmin, Bmax, Bnum = 0, 80, 160
     Hmin, Hmax, Hnum = -500, 8000, 500
-    B = np.linspace(Bmin, Bmax, Bnum + 1)
-    H = np.linspace(Hmin, Hmax, Hnum + 1)
-    B, H = np.meshgrid(B, H)
+    B0 = np.linspace(Bmin, Bmax, Bnum + 1)
+    H0 = np.linspace(Hmin, Hmax, Hnum + 1)
+    B, H = np.meshgrid(B0, H0)
     x, y, z = BLH2xyz(L, B.ravel(), H.ravel(), rad=False)
     la, ba, ha = accurate(x, y, z, rad=False)
     lr, br, hr = rough(x, y, z, rad=False)
 
-    def plot(img, title):
-        ax = plt.gca()
+    def plot(index, img, title):
+        ax = plt.subplot(2, 2, 2 * index - 1)
         ai = ax.imshow(img, aspect='auto', cmap='rainbow')
         ax.set_xlim(0, Bnum)
         ax.set_xticks([0, Bnum/2, Bnum])
@@ -298,19 +298,16 @@ if __name__ == '__main__':
         ax.set_yticks([0, Hnum/2, Hnum])
         ax.set_yticklabels([Hmin, (Hmin+Hmax)/2, Hmax])
         ax.set_ylabel(r'$H (m)$')
-        plt.colorbar(ai, ax=ax).set_label('m')
-        plt.title(title)
+        plt.colorbar(ai, ax=ax).set_label(title)
+        ax = plt.subplot(2, 2, 2 * index)
+        ax.plot(B0, img[0, :], label='H = %dm' % Hmin)
+        ax.set_xlabel(r'$B (\degree)$')
+        ax.set_ylabel(title)
+        plt.legend()
 
-    def show_H():
-        dH = (ha - hr).reshape((Hnum + 1, -1))
-        plot(dH, r'$\Delta H (m)$高程误差')
-        plt.show()
-
-    def show_B():
-        dB = dB2distance(br-ba, rad=False).reshape((Hnum + 1, -1))
-        plot(dB, r'南北距离误差 (m)')
-        plt.show()
-
-    # show_H()
-    show_B()
+    dH = (ha - hr).reshape((Hnum + 1, -1))
+    plot(1, dH, r'$\Delta H (m)$高程误差')
+    dB = dB2distance(br-ba, rad=False).reshape((Hnum + 1, -1))
+    plot(2, dB, r'南北距离误差 (m)')
+    plt.show()
 ```
