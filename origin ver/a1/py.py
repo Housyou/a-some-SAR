@@ -82,15 +82,15 @@ if __name__ == '__main__':
     L = 116
     Bmin, Bmax, Bnum = 0, 80, 160
     Hmin, Hmax, Hnum = -500, 8000, 500
-    B = np.linspace(Bmin, Bmax, Bnum + 1)
-    H = np.linspace(Hmin, Hmax, Hnum + 1)
-    B, H = np.meshgrid(B, H)
+    B0 = np.linspace(Bmin, Bmax, Bnum + 1)
+    H0 = np.linspace(Hmin, Hmax, Hnum + 1)
+    B, H = np.meshgrid(B0, H0)
     x, y, z = BLH2xyz(L, B.ravel(), H.ravel(), rad=False)
     la, ba, ha = accurate(x, y, z, rad=False)
     lr, br, hr = rough(x, y, z, rad=False)
 
-    def plot(img, title):
-        ax = plt.gca()
+    def plot(index, img, title):
+        ax = plt.subplot(2, 2, 2 * index - 1)
         ai = ax.imshow(img, aspect='auto', cmap='rainbow')
         ax.set_xlim(0, Bnum)
         ax.set_xticks([0, Bnum/2, Bnum])
@@ -100,18 +100,15 @@ if __name__ == '__main__':
         ax.set_yticks([0, Hnum/2, Hnum])
         ax.set_yticklabels([Hmin, (Hmin+Hmax)/2, Hmax])
         ax.set_ylabel(r'$H (m)$')
-        plt.colorbar(ai, ax=ax).set_label('m')
-        plt.title(title)
+        plt.colorbar(ai, ax=ax).set_label(title)
+        ax = plt.subplot(2, 2, 2 * index)
+        ax.plot(B0, img[0, :], label='H = %dm' % Hmin)
+        ax.set_xlabel(r'$B (\degree)$')
+        ax.set_ylabel(title)
+        plt.legend()
 
-    def show_H():
-        dH = (ha - hr).reshape((Hnum + 1, -1))
-        plot(dH, r'$\Delta H (m)$高程误差')
-        plt.show()
-
-    def show_B():
-        dB = dB2distance(br-ba, rad=False).reshape((Hnum + 1, -1))
-        plot(dB, r'南北距离误差 (m)')
-        plt.show()
-
-    show_H()
-    # show_B()
+    dH = (ha - hr).reshape((Hnum + 1, -1))
+    plot(1, dH, r'$\Delta H (m)$高程误差')
+    dB = dB2distance(br-ba, rad=False).reshape((Hnum + 1, -1))
+    plot(2, dB, r'南北距离误差 (m)')
+    plt.show()
