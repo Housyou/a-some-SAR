@@ -56,45 +56,6 @@ xyz坐标系转换为BLH坐标系的公式，需要从上式中反解出来：
 > $$N=\frac{a}{\sqrt{1-e^2sin^2B}}$$ 
 > $$H=\frac{z}{sinB}-N(1-e^2)=\frac{p}{cosB}-N$$
 
-$B、N、H$的三个量互相纠缠，需要通过迭代法来求值。假设$H=0$
-> $$B_0 =arctan(\frac{z}{(1-e^2)p})$$ 
-
-> # xyz2BLH 近似公式
-> $$p=\sqrt{x^2+y^2}$$
-> $$\theta=arctan(\frac{z\cdot a}{p\cdot b})$$
-> $$L=arctan2(y,x)$$
-> $$B=arctan(\frac{Z+e^2bsin^3\theta}{p-e^2acos^3\theta})$$
-> $$N=\frac{a}{\sqrt{1-e^2sin^2B}}$$ 
-> $$H=\frac{p}{cosB}-N$$
-```python
-import numpy as np
-
-
-def rad2degree(rad):
-    return rad * 180 / np.pi
-
-
-def xyz2BLH(x, y, z, rad=True):
-    a = 6378137.0000
-    b = 6356752.3141
-    e2 = 1 - (b / a)**2
-    p = np.sqrt(x**2+y**2)
-    theta = np.arctan(z * a/(p * b))
-    L = np.arctan2(y, x)
-    B = np.arctan((z + e2*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
-    N = a/np.sqrt(1-e2*np.sin(B)**2)
-    H = p / np.cos(B) - N
-    if rad:
-        return L, B, H
-    else:
-        return rad2degree(L), rad2degree(B), H
-
-
-x, y, z = -2144900.7573362007, 4397698.262572753, 4078136.627140711
-print(xyz2BLH(x, y, z, rad=False))
-# (116.0, 39.99947761910426, 186.3290731832385)
-# 之前设置的高程是235m，这里少了约49m
-```
 注意上式中经度$L$使用的是$arctan2$函数而非$arctan$函数。
 > $arctan$函数与$arctan2$函数的转换关系
 > $$arctan2(y,x) = \begin{cases}  
@@ -147,4 +108,208 @@ plot(2, z, 'arctan2(y,x)', [-0.99, -0.5, 0, 0.5, 1],
      [r'$-0.99\pi$', r'$-\pi/2$', '0', r'$\pi/2$', r'$\pi$'])
 
 plt.show()
+```
+回到xyz2BLH 迭代公式。$B、N、H$的三个量互相纠缠，需要通过迭代法来求值。假设$H=0$
+$$B_0 =arctan(\frac{z}{(1-e^2)p})$$ 
+那么
+$$N_k=\frac{a}{\sqrt{1-e^2sin^2B_{k-1}}}$$
+$$H_k=\frac{p}{cosB_{k-1}}-N_k$$
+$$B_k=arctan(\frac{z}{(1-\frac{e^2N_k}{N_k+H_k})p})$$
+```python
+import numpy as np
+
+
+def rad2degree(rad):
+    return rad * 180 / np.pi
+
+
+def xyz2BLH(x, y, z, rad=True):
+    a = 6378137.0000
+    b = 6356752.3141
+    e2 = 1 - (b / a)**2
+    p = np.sqrt(x**2+y**2)
+    L = np.arctan2(y, x)
+
+    def ite(z,p):
+        def cal_N(B): return a/np.sqrt(1-e2*np.sin(B)**2)
+        def cal_H(N, B): return p/np.cos(B)-N
+        def cal_B(N, H): return np.arctan(z/((1 - e2*N/(N+H))*p))
+        B = cal_B(1, 0)
+        N = cal_N(B)
+        H0, H = 1e9, cal_H(N, B)
+        while np.abs(H - H0) > 0.1:
+            B = cal_B(N, H)
+            N = cal_N(B)
+            H0, H = H, cal_H(N, B)
+        return H, B
+    
+    H, B = np.vectorize(ite)(z,p)
+    if rad:
+        return L, B * 1, H * 1  # 防止结果变成array(B),array(H)
+    else:
+        return rad2degree(L), rad2degree(B), H * 1
+
+
+x, y, z = -2144900.7573362007, 4397698.262572753, 4078136.627140711
+print(xyz2BLH(x, y, z, rad=False))
+# (116.0, 40.00000000005382, 235.00000501424074)
+```
+> # xyz2BLH 近似公式
+> 已知$p=\sqrt{x^2+y^2}$，$L=arctan2(y,x)$，$B=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})$，设
+> $$\theta=arctan(\frac{z\cdot a}{p\cdot b})$$
+> 用
+> $$B=arctan(\frac{Z+e^2bsin^3\theta}{p-e^2acos^3\theta})$$
+> 来替代迭代公式中的B表达式~~我也不知道原理是什么~~，N和H保持不变
+> $$N=\frac{a}{\sqrt{1-e^2sin^2B}}$$ 
+> $$H=\frac{p}{cosB}-N$$
+```python
+import numpy as np
+
+
+def rad2degree(rad):
+    return rad * 180 / np.pi
+
+
+def xyz2BLH(x, y, z, rad=True):
+    a = 6378137.0000
+    b = 6356752.3141
+    e2 = 1 - (b / a)**2
+    p = np.sqrt(x**2+y**2)
+    theta = np.arctan(z * a/(p * b))
+    L = np.arctan2(y, x)
+    B = np.arctan((z + e2*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
+    N = a/np.sqrt(1-e2*np.sin(B)**2)
+    H = p / np.cos(B) - N
+    if rad:
+        return L, B, H
+    else:
+        return rad2degree(L), rad2degree(B), H
+
+
+x, y, z = -2144900.7573362007, 4397698.262572753, 4078136.627140711
+print(xyz2BLH(x, y, z, rad=False))
+# (116.0, 39.99947761910426, 186.3290731832385)
+# 之前设置的高程是235m，这里少了约49m
+```
+在对电离层网格进行插值之类的场景下，这个误差应该算接受，但我做的实验精度要求亚米级，所以只能采用迭代公式。最后探究一下这个误差变化的规律：
+![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/3.png)
+![img4](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/4.png)
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+# plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签, windows
+plt.rcParams['font.sans-serif'] = ['Heiti TC']  # 用来正常显示中文标签, mac
+
+
+def degree2rad(degree):
+    return degree * np.pi / 180
+
+
+def rad2degree(rad):
+    return rad * 180 / np.pi
+
+
+def BLH2xyz(L, B, H, rad=True):
+    if not rad:
+        L = degree2rad(L)
+        B = degree2rad(B)
+    a = 6378137.0000
+    b = 6356752.3141
+    e2 = 1 - (b / a)**2
+    N = a/np.sqrt(1-e2*np.sin(B)**2)
+    x = (N + H) * np.cos(B) * np.cos(L)
+    y = (N + H) * np.cos(B) * np.sin(L)
+    z = (N * (1 - e2) + H) * np.sin(B)
+    return x, y, z
+
+
+def accurate(x, y, z, rad=True):
+    a = 6378137.0000
+    b = 6356752.3141
+    e2 = 1 - (b / a)**2
+    p = np.sqrt(x**2+y**2)
+    L = np.arctan2(y, x)
+
+    def ite(z, p):
+        def cal_N(B): return a/np.sqrt(1-e2*np.sin(B)**2)
+        def cal_H(N, B): return p/np.cos(B)-N
+        def cal_B(N, H): return np.arctan(z/((1 - e2*N/(N+H))*p))
+        B = cal_B(1, 0)
+        N = cal_N(B)
+        H0, H = 1e9, cal_H(N, B)
+        while np.abs(H - H0) > 0.1:
+            B = cal_B(N, H)
+            N = cal_N(B)
+            H0, H = H, cal_H(N, B)
+        return H, B
+
+    H, B = np.vectorize(ite)(z, p)
+    if rad:
+        return L, B * 1, H * 1
+    else:
+        return rad2degree(L), rad2degree(B), H * 1
+
+
+def rough(x, y, z, rad=True):
+    a = 6378137.0000
+    b = 6356752.3141
+    e2 = 1 - (b / a)**2
+    p = np.sqrt(x**2+y**2)
+    theta = np.arctan(z * a/(p * b))
+    L = np.arctan2(y, x)
+    B = np.arctan((z + e2*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
+    N = a/np.sqrt(1-e2*np.sin(B)**2)
+    H = p / np.cos(B) - N
+    if rad:
+        return L, B, H
+    else:
+        return rad2degree(L), rad2degree(B), H
+
+
+def dB2distance(dB, rad=True):
+    if not rad:
+        dB = degree2rad(dB)
+    a = 6378137.0000
+    b = 6356752.3141
+    r = (a + b) / 2  # 近似
+    return r*dB
+
+
+if __name__ == '__main__':
+    L = 116
+    Bmin, Bmax, Bnum = 0, 80, 160
+    Hmin, Hmax, Hnum = -500, 8000, 500
+    B = np.linspace(Bmin, Bmax, Bnum + 1)
+    H = np.linspace(Hmin, Hmax, Hnum + 1)
+    B, H = np.meshgrid(B, H)
+    x, y, z = BLH2xyz(L, B.ravel(), H.ravel(), rad=False)
+    la, ba, ha = accurate(x, y, z, rad=False)
+    lr, br, hr = rough(x, y, z, rad=False)
+
+    def plot(img, title):
+        ax = plt.gca()
+        ai = ax.imshow(img, aspect='auto', cmap='rainbow')
+        ax.set_xlim(0, Bnum)
+        ax.set_xticks([0, Bnum/2, Bnum])
+        ax.set_xticklabels([Bmin, np.mean([Bmin, Bmax]), Bmax])
+        ax.set_xlabel(r'$B (\degree)$')
+        ax.set_ylim(0, Hnum)
+        ax.set_yticks([0, Hnum/2, Hnum])
+        ax.set_yticklabels([Hmin, (Hmin+Hmax)/2, Hmax])
+        ax.set_ylabel(r'$H (m)$')
+        plt.colorbar(ai, ax=ax).set_label('m')
+        plt.title(title)
+
+    def show_H():
+        dH = (ha - hr).reshape((Hnum + 1, -1))
+        plot(dH, r'$\Delta H (m)$高程误差')
+        plt.show()
+
+    def show_B():
+        dB = dB2distance(br-ba, rad=False).reshape((Hnum + 1, -1))
+        plot(dB, r'南北距离误差 (m)')
+        plt.show()
+
+    # show_H()
+    show_B()
 ```
