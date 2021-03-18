@@ -21,7 +21,7 @@ def plot(index, img, title, color_ticks, color_ticklabels):
     ax.set_yticks([0, num])
     ax.set_yticklabels([start, end])
     ax.set_title(title)
-    ai = ax.imshow(img, cmap='rainbow')
+    ai = ax.imshow(img, cmap='rainbow', vmin=-1, vmax=1)
     colorbar = plt.colorbar(ai, ax=ax)
     colorbar.set_ticks(color_ticks)
     colorbar.set_ticklabels(color_ticklabels)

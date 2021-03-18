@@ -1,3 +1,6 @@
+![img1](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/1.png)
+# 直角坐标系(xyz)转大地坐标系(BLH)近似公式的误差分析
+
 注意上式中经度$L$使用的是$arctan2$函数而非$arctan$函数。
 > $arctan$函数与$arctan2$函数的转换关系
 > $$arctan2(y,x) = \begin{cases}  
@@ -35,7 +38,7 @@ def plot(index, img, title, color_ticks, color_ticklabels):
     ax.set_yticks([0, num])
     ax.set_yticklabels([start, end])
     ax.set_title(title)
-    ai = ax.imshow(img, cmap='rainbow')
+    ai = ax.imshow(img, cmap='rainbow', vmin=-1, vmax=1)
     colorbar = plt.colorbar(ai, ax=ax)
     colorbar.set_ticks(color_ticks)
     colorbar.set_ticklabels(color_ticklabels)
