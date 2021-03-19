@@ -1,5 +1,5 @@
 ![title](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/2.png)
-# 地固坐标系(xyz)转大地坐标系(BLH)近似公式的误差分析
+# 地固坐标系(xyz)转大地坐标系(BLH)的公式分析
 虽然这并不是一个有深度的问题，但我觉得可以说说。  
 > <img src="https://www.zhihu.com/equation?tex=BLH" alt="BLH" class="ee_img tr_noresize" eeimg="1">坐标系中，<img src="https://www.zhihu.com/equation?tex=L" alt="L" class="ee_img tr_noresize" eeimg="1">为经度，<img src="https://www.zhihu.com/equation?tex=B" alt="B" class="ee_img tr_noresize" eeimg="1">为纬度，<img src="https://www.zhihu.com/equation?tex=H" alt="H" class="ee_img tr_noresize" eeimg="1">为点到地球椭球面高程。 
  
@@ -12,21 +12,21 @@
 > <img src="https://www.zhihu.com/equation?tex=a = 6378137.0000 m" alt="a = 6378137.0000 m" class="ee_img tr_noresize" eeimg="1">，为地球椭球的长半轴  
 > <img src="https://www.zhihu.com/equation?tex=b = 6356752.3141 m" alt="b = 6356752.3141 m" class="ee_img tr_noresize" eeimg="1">，为地球椭球的短半轴  
 > 
-<img src="https://www.zhihu.com/equation?tex=e^2 = 1 - (\frac{b}{a})^2" alt="e^2 = 1 - (\frac{b}{a})^2" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=e^2 = 1 - (\frac{b}{a})^2\\" alt="e^2 = 1 - (\frac{b}{a})^2\\" class="ee_img tr_noresize" eeimg="1">
 
 > 
-<img src="https://www.zhihu.com/equation?tex=N=\frac{a}{\sqrt{1-e^2sin^2B}}" alt="N=\frac{a}{\sqrt{1-e^2sin^2B}}" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=N=\frac{a}{\sqrt{1-e^2sin^2B}}\\" alt="N=\frac{a}{\sqrt{1-e^2sin^2B}}\\" class="ee_img tr_noresize" eeimg="1">
  
 > <img src="https://www.zhihu.com/equation?tex=N" alt="N" class="ee_img tr_noresize" eeimg="1">为卯酉圈半径  
 > ~~没有找到合适的图而且我也不知道卯酉圈是哪个圈反正当作辅助量就好了~~
 > 
-<img src="https://www.zhihu.com/equation?tex=x=(N+H)cosBcosL" alt="x=(N+H)cosBcosL" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=x=(N+H)cosBcosL\\" alt="x=(N+H)cosBcosL\\" class="ee_img tr_noresize" eeimg="1">
 
 > 
-<img src="https://www.zhihu.com/equation?tex=y=(N+H)cosBsinL" alt="y=(N+H)cosBsinL" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=y=(N+H)cosBsinL\\" alt="y=(N+H)cosBsinL\\" class="ee_img tr_noresize" eeimg="1">
 
 > 
-<img src="https://www.zhihu.com/equation?tex=z=[N(1-e^2)+H]sinB" alt="z=[N(1-e^2)+H]sinB" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=z=[N(1-e^2)+H]sinB\\" alt="z=[N(1-e^2)+H]sinB\\" class="ee_img tr_noresize" eeimg="1">
 
 ```python
 import numpy as np
@@ -59,22 +59,22 @@ xyz坐标系转换为BLH坐标系的公式，需要从上式中反解出来：
 > # xyz2BLH 迭代公式
 > 已知<img src="https://www.zhihu.com/equation?tex=x=(N+H)cosBcosL" alt="x=(N+H)cosBcosL" class="ee_img tr_noresize" eeimg="1">，<img src="https://www.zhihu.com/equation?tex=y=(N+H)cosBsinL" alt="y=(N+H)cosBsinL" class="ee_img tr_noresize" eeimg="1">，故
 > 
-<img src="https://www.zhihu.com/equation?tex=L=arctan2(y,x)" alt="L=arctan2(y,x)" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=L=arctan2(y,x)\\" alt="L=arctan2(y,x)\\" class="ee_img tr_noresize" eeimg="1">
 
 > 设<img src="https://www.zhihu.com/equation?tex=p=\sqrt{x^2+y^2}" alt="p=\sqrt{x^2+y^2}" class="ee_img tr_noresize" eeimg="1">，<img src="https://www.zhihu.com/equation?tex=cosB\ge0" alt="cosB\ge0" class="ee_img tr_noresize" eeimg="1">恒成立(<img src="https://www.zhihu.com/equation?tex=-90\degree\le B\le90\degree" alt="-90\degree\le B\le90\degree" class="ee_img tr_noresize" eeimg="1">)，则
 > 
-<img src="https://www.zhihu.com/equation?tex=p=(N+H)cosB" alt="p=(N+H)cosB" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=p=(N+H)cosB\\" alt="p=(N+H)cosB\\" class="ee_img tr_noresize" eeimg="1">
 
 > 因为<img src="https://www.zhihu.com/equation?tex=z=[N(1-e^2)+H]sinB" alt="z=[N(1-e^2)+H]sinB" class="ee_img tr_noresize" eeimg="1">，故
 > 
-<img src="https://www.zhihu.com/equation?tex=B=arctan(\frac{z(N+H)}{[N(1-e^2)+H]p})=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})" alt="B=arctan(\frac{z(N+H)}{[N(1-e^2)+H]p})=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=B=arctan(\frac{z(N+H)}{[N(1-e^2)+H]p})=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})\\" alt="B=arctan(\frac{z(N+H)}{[N(1-e^2)+H]p})=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})\\" class="ee_img tr_noresize" eeimg="1">
 
 > 
-<img src="https://www.zhihu.com/equation?tex=H=\frac{z}{sinB}-N(1-e^2)=\frac{p}{cosB}-N" alt="H=\frac{z}{sinB}-N(1-e^2)=\frac{p}{cosB}-N" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=H=\frac{z}{sinB}-N(1-e^2)=\frac{p}{cosB}-N\\" alt="H=\frac{z}{sinB}-N(1-e^2)=\frac{p}{cosB}-N\\" class="ee_img tr_noresize" eeimg="1">
 
 > 其中
 > 
-<img src="https://www.zhihu.com/equation?tex=N=\frac{a}{\sqrt{1-e^2sin^2B}}" alt="N=\frac{a}{\sqrt{1-e^2sin^2B}}" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=N=\frac{a}{\sqrt{1-e^2sin^2B}}\\" alt="N=\frac{a}{\sqrt{1-e^2sin^2B}}\\" class="ee_img tr_noresize" eeimg="1">
 
 
 注意上式中经度<img src="https://www.zhihu.com/equation?tex=L" alt="L" class="ee_img tr_noresize" eeimg="1">使用的是<img src="https://www.zhihu.com/equation?tex=arctan2" alt="arctan2" class="ee_img tr_noresize" eeimg="1">函数而非<img src="https://www.zhihu.com/equation?tex=arctan" alt="arctan" class="ee_img tr_noresize" eeimg="1">函数。
@@ -132,17 +132,17 @@ plt.show()
 ```
 回到xyz2BLH 迭代公式。<img src="https://www.zhihu.com/equation?tex=B、N、H" alt="B、N、H" class="ee_img tr_noresize" eeimg="1">的三个量互相纠缠，需要通过迭代法来求值。假设<img src="https://www.zhihu.com/equation?tex=H=0" alt="H=0" class="ee_img tr_noresize" eeimg="1">
 
-<img src="https://www.zhihu.com/equation?tex=B_0 =arctan(\frac{z}{(1-e^2)p})" alt="B_0 =arctan(\frac{z}{(1-e^2)p})" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=B_0 =arctan(\frac{z}{(1-e^2)p})\\" alt="B_0 =arctan(\frac{z}{(1-e^2)p})\\" class="ee_img tr_noresize" eeimg="1">
  
 那么
 
-<img src="https://www.zhihu.com/equation?tex=N_k=\frac{a}{\sqrt{1-e^2sin^2B_{k-1}}}" alt="N_k=\frac{a}{\sqrt{1-e^2sin^2B_{k-1}}}" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=N_k=\frac{a}{\sqrt{1-e^2sin^2B_{k-1}}}\\" alt="N_k=\frac{a}{\sqrt{1-e^2sin^2B_{k-1}}}\\" class="ee_img tr_noresize" eeimg="1">
 
 
-<img src="https://www.zhihu.com/equation?tex=H_k=\frac{p}{cosB_{k-1}}-N_k" alt="H_k=\frac{p}{cosB_{k-1}}-N_k" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=H_k=\frac{p}{cosB_{k-1}}-N_k\\" alt="H_k=\frac{p}{cosB_{k-1}}-N_k\\" class="ee_img tr_noresize" eeimg="1">
 
 
-<img src="https://www.zhihu.com/equation?tex=B_k=arctan(\frac{z}{(1-\frac{e^2N_k}{N_k+H_k})p})" alt="B_k=arctan(\frac{z}{(1-\frac{e^2N_k}{N_k+H_k})p})" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=B_k=arctan(\frac{z}{(1-\frac{e^2N_k}{N_k+H_k})p})\\" alt="B_k=arctan(\frac{z}{(1-\frac{e^2N_k}{N_k+H_k})p})\\" class="ee_img tr_noresize" eeimg="1">
 
 ```python
 import numpy as np
@@ -186,18 +186,21 @@ print(xyz2BLH(x, y, z, rad=False))
 > # xyz2BLH 近似公式
 > 已知<img src="https://www.zhihu.com/equation?tex=p=\sqrt{x^2+y^2}" alt="p=\sqrt{x^2+y^2}" class="ee_img tr_noresize" eeimg="1">，<img src="https://www.zhihu.com/equation?tex=L=arctan2(y,x)" alt="L=arctan2(y,x)" class="ee_img tr_noresize" eeimg="1">，迭代公式中<img src="https://www.zhihu.com/equation?tex=B=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})" alt="B=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})" class="ee_img tr_noresize" eeimg="1">。放弃这个公式，设
 > 
-<img src="https://www.zhihu.com/equation?tex=\theta=arctan(\frac{z\cdot a}{p\cdot b})" alt="\theta=arctan(\frac{z\cdot a}{p\cdot b})" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=\theta=arctan(\frac{z\cdot a}{p\cdot b})\\" alt="\theta=arctan(\frac{z\cdot a}{p\cdot b})\\" class="ee_img tr_noresize" eeimg="1">
+
+> 
+<img src="https://www.zhihu.com/equation?tex=e_2^2=(\frac{a}{b})^2-1=\frac{e^2}{1-e^2}\\" alt="e_2^2=(\frac{a}{b})^2-1=\frac{e^2}{1-e^2}\\" class="ee_img tr_noresize" eeimg="1">
 
 > 用
 > 
-<img src="https://www.zhihu.com/equation?tex=B=arctan(\frac{z+e^2bsin^3\theta}{p-e^2acos^3\theta})" alt="B=arctan(\frac{z+e^2bsin^3\theta}{p-e^2acos^3\theta})" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=B=arctan(\frac{z+e_2^2bsin^3\theta}{p-e^2acos^3\theta})\\" alt="B=arctan(\frac{z+e_2^2bsin^3\theta}{p-e^2acos^3\theta})\\" class="ee_img tr_noresize" eeimg="1">
 
 > 来替代迭代公式中的<img src="https://www.zhihu.com/equation?tex=B" alt="B" class="ee_img tr_noresize" eeimg="1">表达式~~我也不知道原理是什么~~，<img src="https://www.zhihu.com/equation?tex=N" alt="N" class="ee_img tr_noresize" eeimg="1">和<img src="https://www.zhihu.com/equation?tex=H" alt="H" class="ee_img tr_noresize" eeimg="1">保持不变
 > 
-<img src="https://www.zhihu.com/equation?tex=N=\frac{a}{\sqrt{1-e^2sin^2B}}" alt="N=\frac{a}{\sqrt{1-e^2sin^2B}}" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=N=\frac{a}{\sqrt{1-e^2sin^2B}}\\" alt="N=\frac{a}{\sqrt{1-e^2sin^2B}}\\" class="ee_img tr_noresize" eeimg="1">
  
 > 
-<img src="https://www.zhihu.com/equation?tex=H=\frac{p}{cosB}-N" alt="H=\frac{p}{cosB}-N" class="ee_img tr_noresize" eeimg="1">
+<img src="https://www.zhihu.com/equation?tex=H=\frac{p}{cosB}-N\\" alt="H=\frac{p}{cosB}-N\\" class="ee_img tr_noresize" eeimg="1">
 
 ```python
 import numpy as np
@@ -214,7 +217,7 @@ def xyz2BLH(x, y, z, rad=True):
     p = np.sqrt(x**2+y**2)
     theta = np.arctan(z * a/(p * b))
     L = np.arctan2(y, x)
-    B = np.arctan((z + e2*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
+    B = np.arctan((z + e2/(1-e2)*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
     N = a/np.sqrt(1-e2*np.sin(B)**2)
     H = p / np.cos(B) - N
     if rad:
@@ -225,13 +228,12 @@ def xyz2BLH(x, y, z, rad=True):
 
 x, y, z = -2144900.7573362007, 4397698.262572753, 4078136.627140711
 print(xyz2BLH(x, y, z, rad=False))
-# (116.0, 39.99947761910426, 186.3290731832385)
-# 之前设置的高程是235m，这里少了约49m
+# (116.0, 40.00000000000001, 235.0)
+# 完全一致
 ```
-在对电离层网格进行插值之类的场景下，这个误差应该算是可以接受，但我做的实验精度要求亚米级，所以只能采用迭代公式。最后探究一下这个误差变化的规律：
+最后探究一下这个近似公式的误差会如何变化：
 ![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/3.png)
-
-可见误差几乎仅与纬度有关，垂直误差<img src="https://www.zhihu.com/equation?tex=(\Delta H)" alt="(\Delta H)" class="ee_img tr_noresize" eeimg="1">随着纬度的升高而增大，南北误差<img src="https://www.zhihu.com/equation?tex=(\Delta B)" alt="(\Delta B)" class="ee_img tr_noresize" eeimg="1">在<img src="https://www.zhihu.com/equation?tex=60\degree" alt="60\degree" class="ee_img tr_noresize" eeimg="1">左右时最大。或许制作一个查找表，或者给<img src="https://www.zhihu.com/equation?tex=B" alt="B" class="ee_img tr_noresize" eeimg="1">的近似表达式增加一个修正项会更好。
+误差不足微米，是非常理想的公式。
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -261,41 +263,15 @@ def BLH2xyz(L, B, H, rad=True):
     return x, y, z
 
 
-def accurate(x, y, z, rad=True):
-    a = 6378137.0000
-    b = 6356752.3141
-    e2 = 1 - (b / a)**2
-    p = np.sqrt(x**2+y**2)
-    L = np.arctan2(y, x)
-
-    def ite(z, p):
-        def cal_N(B): return a/np.sqrt(1-e2*np.sin(B)**2)
-        def cal_H(N, B): return p/np.cos(B)-N
-        def cal_B(N, H): return np.arctan(z/((1 - e2*N/(N+H))*p))
-        B = cal_B(1, 0)
-        N = cal_N(B)
-        H0, H = 1e9, cal_H(N, B)
-        while np.abs(H - H0) > 0.1:
-            B = cal_B(N, H)
-            N = cal_N(B)
-            H0, H = H, cal_H(N, B)
-        return H, B
-
-    H, B = np.vectorize(ite)(z, p)
-    if rad:
-        return L, B * 1, H * 1
-    else:
-        return rad2degree(L), rad2degree(B), H * 1
-
-
-def rough(x, y, z, rad=True):
+def xyz2BLH(x, y, z, rad=True):
     a = 6378137.0000
     b = 6356752.3141
     e2 = 1 - (b / a)**2
     p = np.sqrt(x**2+y**2)
     theta = np.arctan(z * a/(p * b))
     L = np.arctan2(y, x)
-    B = np.arctan((z + e2*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
+    B = np.arctan((z + e2/(1-e2)*b*np.sin(theta)**3) /
+                  (p - e2*a*np.cos(theta)**3))
     N = a/np.sqrt(1-e2*np.sin(B)**2)
     H = p / np.cos(B) - N
     if rad:
@@ -315,17 +291,16 @@ def dB2distance(dB, rad=True):
 
 if __name__ == '__main__':
     L = 116
-    Bmin, Bmax, Bnum = 0, 80, 160
-    Hmin, Hmax, Hnum = -500, 8000, 500
-    B0 = np.linspace(Bmin, Bmax, Bnum + 1)
-    H0 = np.linspace(Hmin, Hmax, Hnum + 1)
-    B, H = np.meshgrid(B0, H0)
-    x, y, z = BLH2xyz(L, B.ravel(), H.ravel(), rad=False)
-    la, ba, ha = accurate(x, y, z, rad=False)
-    lr, br, hr = rough(x, y, z, rad=False)
+    Bmin, Bmax, Bnum = 0, 80, 240
+    Hmin, Hmax, Hnum = -500, 8000, 850
+    B = np.linspace(Bmin, Bmax, Bnum + 1)
+    H = np.linspace(Hmin, Hmax, Hnum + 1)
+    B, H = np.meshgrid(B, H)
+    x, y, z = BLH2xyz(L, B, H, rad=False)
+    l, b, h = xyz2BLH(x, y, z, rad=False)
 
     def plot(index, img, title):
-        ax = plt.subplot(2, 2, 2 * index - 1)
+        ax = plt.subplot(1, 2, index)
         ai = ax.imshow(img, aspect='auto', cmap='rainbow')
         ax.set_xlim(0, Bnum)
         ax.set_xticks([0, Bnum/2, Bnum])
@@ -336,15 +311,8 @@ if __name__ == '__main__':
         ax.set_yticklabels([Hmin, (Hmin+Hmax)/2, Hmax])
         ax.set_ylabel(r'<img src="https://www.zhihu.com/equation?tex=H (m)" alt="H (m)" class="ee_img tr_noresize" eeimg="1">')
         plt.colorbar(ai, ax=ax).set_label(title)
-        ax = plt.subplot(2, 2, 2 * index)
-        ax.plot(B0, img[0, :], label='H = %dm' % Hmin)
-        ax.set_xlabel(r'<img src="https://www.zhihu.com/equation?tex=B (\degree)" alt="B (\degree)" class="ee_img tr_noresize" eeimg="1">')
-        ax.set_ylabel(title)
-        plt.legend()
 
-    dH = (ha - hr).reshape((Hnum + 1, -1))
-    plot(1, dH, r'<img src="https://www.zhihu.com/equation?tex=\Delta H (m)" alt="\Delta H (m)" class="ee_img tr_noresize" eeimg="1">高程误差')
-    dB = dB2distance(br-ba, rad=False).reshape((Hnum + 1, -1))
-    plot(2, dB, r'南北距离误差 (m)')
+    plot(1, h-H, r'<img src="https://www.zhihu.com/equation?tex=\Delta H (m)" alt="\Delta H (m)" class="ee_img tr_noresize" eeimg="1">高程误差')
+    plot(2, dB2distance(b-B, rad=False), r'南北距离误差 (m)')
     plt.show()
 ```

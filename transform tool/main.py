@@ -3,7 +3,7 @@ import re
 import base64
 
 
-def replace_tex(inline_tag, directory):
+def replace_tex(inline_tag,interline_tag, directory):
     filename = 'a1/直角坐标系(xyz)转大地坐标系(BLH)近似公式的误差分析.md'
 
     def dashrepl(matchobj, tag):
@@ -11,7 +11,6 @@ def replace_tex(inline_tag, directory):
         return tag.format(formular, formular)
     inline_pattern = "\$\n*(.*?)\n*\$"
     interline_pattern = '\$%s\$' % inline_pattern
-    interline_tag = '\n%s\n' % inline_tag
 
     with open('../origin ver/'+filename, 'r', encoding='UTF-8') as f:
         content = f.read()
@@ -25,12 +24,14 @@ def replace_tex(inline_tag, directory):
 
 def md2zhihu():
     inline_tag = '<img src="https://www.zhihu.com/equation?tex={}" alt="{}" class="ee_img tr_noresize" eeimg="1">'
-    replace_tex(inline_tag, '../zhihu ver')
+    interline_tag = '\n<img src="https://www.zhihu.com/equation?tex={}\\\\" alt="{}\\\\" class="ee_img tr_noresize" eeimg="1">\n'
+    replace_tex(inline_tag,interline_tag, '../zhihu ver')
 
 
 def md2github():
     inline_tag = '<img src="https://render.githubusercontent.com/render/math?math={}" />'
-    replace_tex(inline_tag, '..')
+    interline_tag = '\n<img src="https://render.githubusercontent.com/render/math?math={}" />\n'
+    replace_tex(inline_tag,interline_tag, '..')
 
 
 def img2base64():
