@@ -158,8 +158,9 @@ print(xyz2BLH(x, y, z, rad=False))
 > # xyz2BLH 近似公式
 > 已知$p=\sqrt{x^2+y^2}$，$L=arctan2(y,x)$，迭代公式中$B=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})$。放弃这个公式，设
 > $$\theta=arctan(\frac{z\cdot a}{p\cdot b})$$
+> $$e_2^2=(\frac{a}{b})^2-1=\frac{e^2}{1-e^2}$$
 > 用
-> $$B=arctan(\frac{z+e^2bsin^3\theta}{p-e^2acos^3\theta})$$
+> $$B=arctan(\frac{z+e_2^2bsin^3\theta}{p-e^2acos^3\theta})$$
 > 来替代迭代公式中的$B$表达式~~我也不知道原理是什么~~，$N$和$H$保持不变
 > $$N=\frac{a}{\sqrt{1-e^2sin^2B}}$$ 
 > $$H=\frac{p}{cosB}-N$$
@@ -178,7 +179,7 @@ def xyz2BLH(x, y, z, rad=True):
     p = np.sqrt(x**2+y**2)
     theta = np.arctan(z * a/(p * b))
     L = np.arctan2(y, x)
-    B = np.arctan((z + e2*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
+    B = np.arctan((z + e2/(1-e2)*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
     N = a/np.sqrt(1-e2*np.sin(B)**2)
     H = p / np.cos(B) - N
     if rad:
@@ -189,13 +190,11 @@ def xyz2BLH(x, y, z, rad=True):
 
 x, y, z = -2144900.7573362007, 4397698.262572753, 4078136.627140711
 print(xyz2BLH(x, y, z, rad=False))
-# (116.0, 39.99947761910426, 186.3290731832385)
-# 之前设置的高程是235m，这里少了约49m
+# (116.0, 40.00000000000001, 235.0)
+# 完全一致
 ```
-在对电离层网格进行插值之类的场景下，这个误差应该算是可以接受，但我做的实验精度要求亚米级，所以只能采用迭代公式。最后探究一下这个误差变化的规律：
+最后探究一下这个近似公式的误差会如何变化：
 ![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/3.png)
-
-可见误差几乎仅与纬度有关，垂直误差$(\Delta H)$随着纬度的升高而增大，南北误差$(\Delta B)$在$60\degree$左右时最大。或许制作一个查找表，或者给$B$的近似表达式增加一个修正项会更好。
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -259,7 +258,7 @@ def rough(x, y, z, rad=True):
     p = np.sqrt(x**2+y**2)
     theta = np.arctan(z * a/(p * b))
     L = np.arctan2(y, x)
-    B = np.arctan((z + e2*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
+    B = np.arctan((z + e2/(1-e2)*b*np.sin(theta)**3)/(p - e2*a*np.cos(theta)**3))
     N = a/np.sqrt(1-e2*np.sin(B)**2)
     H = p / np.cos(B) - N
     if rad:
