@@ -155,6 +155,92 @@ x, y, z = -2144900.7573362007, 4397698.262572753, 4078136.627140711
 print(xyz2BLH(x, y, z, rad=False))
 # (116.0, 40.00000000005382, 235.00000501424074)
 ```
+代码使用了np.vectorize()函数来实现批量化处理，但[numpy文档](https://numpy.org/doc/stable/reference/generated/numpy.vectorize.html)指出
+> The vectorize function is provided primarily for convenience, not for performance. The implementation is essentially a for loop.
+> 
+> vectorize函数主要用于简化代码，而非优化代码。它的实现本质上是个循环。
+
+因此需要用一定的循环次数来代替while循环，这样才能充分发挥numpy的高性能。
+![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/3.png)
+上图展示了循环次数一定时最终高程的精度。可见一般1次循环就能达到亚米级的精度，2次循环能达到毫米级的精度。使用3次循环来作为迭代的终止条件是非常保险的。
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+# plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签, windows
+plt.rcParams['font.sans-serif'] = ['Heiti TC']  # 用来正常显示中文标签, mac
+
+
+def degree2rad(degree):
+    return degree * np.pi / 180
+
+
+def BLH2xyz(L, B, H, rad=True):
+    if not rad:
+        L = degree2rad(L)
+        B = degree2rad(B)
+    a = 6378137.0000
+    b = 6356752.3141
+    e2 = 1 - (b / a)**2
+    N = a/np.sqrt(1-e2*np.sin(B)**2)
+    x = (N + H) * np.cos(B) * np.cos(L)
+    y = (N + H) * np.cos(B) * np.sin(L)
+    z = (N * (1 - e2) + H) * np.sin(B)
+    return x, y, z
+
+
+def cal_times(x, y, z, times):
+    a = 6378137.0000
+    b = 6356752.3141
+    e2 = 1 - (b / a)**2
+    p = np.sqrt(x**2+y**2)
+    L = np.arctan2(y, x)
+
+    def cal_N(B): return a/np.sqrt(1-e2*np.sin(B)**2)
+    def cal_H(N, B): return p/np.cos(B)-N
+    def cal_B(N, H): return np.arctan(z/((1 - e2*N/(N+H))*p))
+    B = cal_B(1, 0)
+    N = cal_N(B)
+    H0, H = 1e9, cal_H(N, B)
+    for _ in range(times):
+        B = cal_B(N, H)
+        N = cal_N(B)
+        H0, H = H, cal_H(N, B)
+
+    return H
+
+
+if __name__ == '__main__':
+    L = 116
+    Bmin, Bmax, Bnum = 0, 80, 480
+    Hmin, Hmax, Hnum = -500, 8000, 1700
+    B = np.linspace(Bmin, Bmax, Bnum + 1)
+    H = np.linspace(Hmin, Hmax, Hnum + 1)
+    B, H = np.meshgrid(B, H)
+    x, y, z = BLH2xyz(L, B, H, rad=False)
+
+    def plot(index, times):
+        h = cal_times(x, y, z, times)
+        img = np.abs(h-H)
+        ax = plt.subplot(2, 2, index)
+        ai = ax.imshow(img, aspect='auto', cmap='rainbow')
+        ax.set_xlim(0, Bnum)
+        ax.set_xticks([0, Bnum/2, Bnum])
+        ax.set_xticklabels([Bmin, np.mean([Bmin, Bmax]), Bmax])
+        ax.set_xlabel(r'$B (\degree)$')
+        ax.set_ylim(0, Hnum)
+        ax.set_yticks([0, Hnum/2, Hnum])
+        ax.set_yticklabels([Hmin, (Hmin+Hmax)/2, Hmax])
+        ax.set_ylabel(r'$H (m)$')
+        ax.set_title('迭代%d次' % times)
+        plt.colorbar(ai, ax=ax).set_label('高程误差(m)')
+    fig = plt.figure()
+    plot(1, 1)
+    plot(2, 2)
+    plot(3, 3)
+    plot(4, 4)
+    fig.tight_layout()
+    plt.show()
+```
 > # xyz2BLH 近似公式
 > 已知$p=\sqrt{x^2+y^2}$，$L=arctan2(y,x)$，迭代公式中$B=arctan(\frac{z}{(1-\frac{e^2N}{N+H})p})$。放弃这个公式，设
 > $$\theta=arctan(\frac{z\cdot a}{p\cdot b})$$
@@ -193,9 +279,9 @@ print(xyz2BLH(x, y, z, rad=False))
 # (116.0, 40.00000000000001, 235.0)
 # 完全一致
 ```
-最后探究一下这个近似公式的误差会如何变化：
-![img3](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/3.png)
-误差不足微米，是非常理想的公式。
+以下是这个近似公式的误差的变化规律：
+![img4](https://raw.githubusercontent.com/Housyou/a-some-SAR/master/origin%20ver/a1/imgs/4.png)
+不需要循环，精度却超过了3次循环的迭代公式，是非常理想的公式。
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
